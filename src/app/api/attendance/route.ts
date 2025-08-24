@@ -38,3 +38,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
   }
 }
+
+export async function GET() {
+  try {
+    const logs = await prisma.attendance.findMany({
+      orderBy: { checkIn: "desc" },
+      take: 20, // latest 20 logs
+      include: {
+        client: { select: { name: true, email: true, membershipType: true } }
+      }
+    })
+
+    return NextResponse.json({ success: true, logs })
+  } catch (err) {
+    console.error(err)
+    return NextResponse.json({ success: false, error: "Failed to fetch attendance logs" }, { status: 500 })
+  }
+}

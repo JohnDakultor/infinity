@@ -7,16 +7,16 @@ const prisma = new PrismaClient()
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { name, email, phone, membershipType, startDate, expirationDate } = body
+    const { name, email, membershipType, startDate, expirationDate, cardId } = body
 
     const client = await prisma.client.create({
       data: {
         name,
         email,
-        phone,
         membershipType,
         startDate: new Date(startDate),
         expirationDate: new Date(expirationDate),
+        cardId, // ✅ store NFC card UID
       },
     })
 
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
 }
+
 
 export async function GET(req: Request) {
   try {

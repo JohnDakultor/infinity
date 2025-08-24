@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -14,7 +14,28 @@ export default function AddClientPage() {
     membershipType: "",
     startDate: "",
     expirationDate: "",
+    cardId: "", // ✅ new field
   })
+
+  // 🔌 Connect to WebSocket for NFC
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:4000")
+
+    socket.onopen = () => console.log("✅ WS connected (Add Client)")
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.uid) {
+          console.log("📡 NFC UID received:", data.uid)
+          setForm((prev) => ({ ...prev, cardId: data.uid })) // auto-fill cardId
+        }
+      } catch (err) {
+        console.warn("❗ Non-JSON message:", event.data)
+      }
+    }
+
+    return () => socket.close()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -25,38 +46,37 @@ export default function AddClientPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-
-  try {
-    const res = await fetch("/api/client", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    })
-
-    const data = await res.json()
-
-    if (data.success) {
-      alert("Client added successfully")
-      setForm({
-        name: "",
-        email: "",
-        membershipType: "",
-        startDate: "",
-        expirationDate: "",
+    e.preventDefault()
+    try {
+      const res = await fetch("/api/client", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       })
-    } else {
-      alert("Error: " + data.error)
-    }
-  } catch (err) {
-    alert("Failed to submit")
-    console.error(err)
-  }
-}
 
+      const data = await res.json()
+
+      if (data.success) {
+        alert("✅ Client added successfully with NFC card")
+        setForm({
+          name: "",
+          email: "",
+          membershipType: "",
+          startDate: "",
+          expirationDate: "",
+          cardId: "",
+        })
+      } else {
+        alert("❌ " + (data.error || "Email must be unique"))
+      }
+    } catch (err) {
+      alert("Failed to submit")
+      console.error(err)
+    }
+  }
 
   return (
-    <main className="min-h-screen  p-6">
+    <main className="min-h-screen p-6">
       <div className="max-w-3xl mx-auto">
         <Card>
           <CardHeader>
@@ -91,7 +111,7 @@ export default function AddClientPage() {
 
               <div>
                 <Label>Membership Type</Label>
-                <Select onValueChange={handleSelect}>
+                <Select onValueChange={handleSelect} value={form.membershipType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select membership type" />
                   </SelectTrigger>
@@ -126,6 +146,18 @@ export default function AddClientPage() {
                     required
                   />
                 </div>
+              </div>
+
+              {/* ✅ NFC Card ID auto-filled */}
+              <div>
+                <Label htmlFor="cardId">NFC Card</Label>
+                <Input
+                  id="cardId"
+                  name="cardId"
+                  value={form.cardId}
+                  readOnly
+                  placeholder="Tap card to auto-fill"
+                />
               </div>
 
               <Button type="submit" className="w-full mt-4">
