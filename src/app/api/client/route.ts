@@ -7,12 +7,12 @@ const prisma = new PrismaClient()
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { name, email, membershipType, startDate, expirationDate, cardId } = body
+    const { name, contactNumber, membershipType, startDate, expirationDate, cardId } = body
 
     const client = await prisma.client.create({
       data: {
         name,
-        email,
+        contactNumber,
         membershipType,
         startDate: new Date(startDate),
         expirationDate: new Date(expirationDate),

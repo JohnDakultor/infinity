@@ -45,7 +45,7 @@ export async function GET() {
       orderBy: { checkIn: "desc" },
       take: 20, // latest 20 logs
       include: {
-        client: { select: { name: true, email: true, membershipType: true } }
+        client: { select: { name: true, contactNumber: true, membershipType: true } }
       }
     })
 

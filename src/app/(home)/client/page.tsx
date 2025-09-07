@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function AddClientPage() {
   const [form, setForm] = useState({
     name: "",
-    email: "",
+    contactNumber: "",
     membershipType: "",
     startDate: "",
     expirationDate: "",
@@ -60,7 +60,7 @@ export default function AddClientPage() {
         alert("✅ Client added successfully with NFC card")
         setForm({
           name: "",
-          email: "",
+          contactNumber: "",
           membershipType: "",
           startDate: "",
           expirationDate: "",
@@ -97,14 +97,14 @@ export default function AddClientPage() {
               </div>
 
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="contactNumber">Contact Number</Label>
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={form.email}
+                  id="contactNumber"
+                  name="contactNumber"
+                  type="number"
+                  value={form.contactNumber}
                   onChange={handleChange}
-                  placeholder="john@example.com"
+                  placeholder="0987654321"
                   required
                 />
               </div>
@@ -157,6 +157,7 @@ export default function AddClientPage() {
                   value={form.cardId}
                   readOnly
                   placeholder="Tap card to auto-fill"
+                  
                 />
               </div>
 

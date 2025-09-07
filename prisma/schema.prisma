@@ -24,14 +24,14 @@ model User {
 model Client {
   id              String       @id @default(uuid())
   name            String
-  email           String       @unique
-  phone           String?
+  contactNumber   String?       @unique
   cardId          String?      @unique
   joinDate        DateTime     @default(now())
   membershipType  String
   startDate       DateTime
   expirationDate  DateTime
   attendances     Attendance[]
+  isFrozen        Boolean      @default(false)
 }
 
 
